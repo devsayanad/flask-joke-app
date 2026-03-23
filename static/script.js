@@ -1,5 +1,6 @@
 let currentJoke = "";
 
+
 async function getJoke() {
   try {
     const res = await fetch("/get_joke");
@@ -12,12 +13,11 @@ async function getJoke() {
   }
 }
 
+
 function speakJoke() {
   if (!currentJoke) return alert("Get a joke first!");
 
-  let cleanText = currentJoke.replace(/😂|🤣|😅|😆/g, "");
-
-  let speech = new SpeechSynthesisUtterance(cleanText);
+  let speech = new SpeechSynthesisUtterance(currentJoke);
   speechSynthesis.cancel();
   speechSynthesis.speak(speech);
 }
@@ -26,37 +26,42 @@ function saveJoke() {
   if (!currentJoke) return alert("Get a joke first!");
 
   let saved = JSON.parse(localStorage.getItem("jokes")) || [];
-
   saved.push(currentJoke);
 
   localStorage.setItem("jokes", JSON.stringify(saved));
 
-  alert("Saved locally 💾");
+  alert("Saved 💾");
+  loadSavedJokes();
 }
 
 function loadSavedJokes() {
   let saved = JSON.parse(localStorage.getItem("jokes")) || [];
-
   let container = document.getElementById("savedJokes");
 
   if (!container) return;
 
-  if (saved.length === 0) {
-    container.innerHTML = "<p>No jokes saved 😢</p>";
-    return;
-  }
-
   container.innerHTML = "";
 
-  saved.forEach(joke => {
-    let p = document.createElement("p");
-    p.innerText = joke;
+  saved.forEach((joke, index) => {
+    let div = document.createElement("div");
 
-    let hr = document.createElement("hr");
+    div.innerHTML = `
+      <p>${joke}</p>
+      <button onclick="deleteJoke(${index})">🗑️ Delete</button>
+      <hr>
+    `;
 
-    container.appendChild(p);
-    container.appendChild(hr);
+    container.appendChild(div);
   });
+}
+function deleteJoke(index) {
+  let saved = JSON.parse(localStorage.getItem("jokes")) || [];
+
+  saved.splice(index, 1);
+
+  localStorage.setItem("jokes", JSON.stringify(saved));
+
+  loadSavedJokes();
 }
 
 
