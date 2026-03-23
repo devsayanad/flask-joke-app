@@ -1,6 +1,6 @@
 let currentJoke = "";
 
-
+// Get joke
 async function getJoke() {
   try {
     const res = await fetch("/get_joke");
@@ -13,15 +13,25 @@ async function getJoke() {
   }
 }
 
-
+// Speak joke (emoji removed)
 function speakJoke() {
   if (!currentJoke) return alert("Get a joke first!");
 
-  let speech = new SpeechSynthesisUtterance(currentJoke);
+  // REMOVE emojis safely
+  let cleanText = currentJoke
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "") // emoji range
+    .replace(/😂|🤣|😅|😆/g, "");           // common emojis
+
+  let speech = new SpeechSynthesisUtterance(cleanText);
+
+  speech.lang = "en-US";
+  speech.rate = 1;
+
   speechSynthesis.cancel();
   speechSynthesis.speak(speech);
 }
 
+// Save joke
 function saveJoke() {
   if (!currentJoke) return alert("Get a joke first!");
 
@@ -34,6 +44,7 @@ function saveJoke() {
   loadSavedJokes();
 }
 
+// Load saved jokes
 function loadSavedJokes() {
   let saved = JSON.parse(localStorage.getItem("jokes")) || [];
   let container = document.getElementById("savedJokes");
@@ -54,6 +65,8 @@ function loadSavedJokes() {
     container.appendChild(div);
   });
 }
+
+// Delete joke
 function deleteJoke(index) {
   let saved = JSON.parse(localStorage.getItem("jokes")) || [];
 
@@ -64,5 +77,5 @@ function deleteJoke(index) {
   loadSavedJokes();
 }
 
-
+// Auto load
 window.onload = loadSavedJokes;
