@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Joke Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+</head>
+
+<body>
+  <div class="container">
+    <h1>😂 Joke Generator</h1>
+
+    <p id="joke">Click button to get joke</p>
+
+    <button onclick="getJoke()">New Joke</button>
+    <button onclick="speakJoke()">Speak</button>
+    <button onclick="saveJoke()">Save ❤️</button>
+
+    <br><br>
+    <a href="/saved">📂 View Saved Jokes</a>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
