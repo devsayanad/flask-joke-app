@@ -6,17 +6,15 @@
 </head>
 
 <body>
-  <h1>❤️ Saved Jokes</h1>
+  <div class="container">
+    <h1>❤️ Saved Jokes</h1>
 
-  {% if jokes %}
-    {% for joke in jokes %}
-      <p>{{ joke }}</p>
-      <hr>
-    {% endfor %}
-  {% else %}
-    <p>No jokes saved yet 😢</p>
-  {% endif %}
+    <!-- Jokes will load here -->
+    <div id="savedJokes"></div>
 
-  <a href="/">⬅ Back</a>
+    <a href="/">⬅ Back</a>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

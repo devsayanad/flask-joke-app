@@ -24,7 +24,7 @@ def get_joke():
     except:
         return jsonify({"joke": "Joke API failed 😅 Try again!"})
 
-@app.route("/save_joke", methods=["POST"])
+
 def save_joke():
     data = request.get_json()
 
@@ -41,7 +41,6 @@ def save_joke():
 
     return jsonify({"message": "Saved!"})
 
-@app.route("/saved")
 def saved():
     return render_template("saved.html", jokes=jokes)
 

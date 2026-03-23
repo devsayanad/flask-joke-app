@@ -1,59 +1,63 @@
 let currentJoke = "";
 
-// Get joke
 async function getJoke() {
   try {
     const res = await fetch("/get_joke");
     const data = await res.json();
 
     currentJoke = data.joke;
-
     document.getElementById("joke").innerText = currentJoke;
   } catch (error) {
     document.getElementById("joke").innerText = "Failed to load joke 😅";
-    console.error(error);
   }
 }
 
-// Speak joke
 function speakJoke() {
-  if (!currentJoke) {
-    alert("Get a joke first!");
-    return;
-  }
+  if (!currentJoke) return alert("Get a joke first!");
 
   let cleanText = currentJoke.replace(/😂|🤣|😅|😆/g, "");
 
   let speech = new SpeechSynthesisUtterance(cleanText);
-  speech.lang = "en-US";
-
   speechSynthesis.cancel();
   speechSynthesis.speak(speech);
 }
 
-// Save joke
-async function saveJoke() {
-  if (!currentJoke || currentJoke.length < 5) {
-    alert("Get a valid joke first!");
+function saveJoke() {
+  if (!currentJoke) return alert("Get a joke first!");
+
+  let saved = JSON.parse(localStorage.getItem("jokes")) || [];
+
+  saved.push(currentJoke);
+
+  localStorage.setItem("jokes", JSON.stringify(saved));
+
+  alert("Saved locally 💾");
+}
+
+function loadSavedJokes() {
+  let saved = JSON.parse(localStorage.getItem("jokes")) || [];
+
+  let container = document.getElementById("savedJokes");
+
+  if (!container) return;
+
+  if (saved.length === 0) {
+    container.innerHTML = "<p>No jokes saved 😢</p>";
     return;
   }
 
-  console.log("Saving:", currentJoke); // debug
+  container.innerHTML = "";
 
-  try {
-    const res = await fetch("/save_joke", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ joke: currentJoke })
-    });
+  saved.forEach(joke => {
+    let p = document.createElement("p");
+    p.innerText = joke;
 
-    const data = await res.json();
+    let hr = document.createElement("hr");
 
-    alert(data.message || "Saved!");
-  } catch (error) {
-    alert("Failed to save joke 😅");
-    console.error(error);
-  }
+    container.appendChild(p);
+    container.appendChild(hr);
+  });
 }
+
+
+window.onload = loadSavedJokes;
