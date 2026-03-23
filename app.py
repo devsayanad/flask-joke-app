@@ -26,7 +26,7 @@ def home():
 @app.route("/get_joke")
 def get_joke():
     url = "https://official-joke-api.appspot.com/random_joke"
-    res = requests.get(url).json()
+    res = requests.get(url, timeout=5).json()
     joke = res["setup"] + " 😂 " + res["punchline"]
     return jsonify({"joke": joke})
 
