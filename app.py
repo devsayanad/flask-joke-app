@@ -1,23 +1,11 @@
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request
 import requests
-import sqlite3
+import os
 
 app = Flask(__name__)
 
-
-def init_db():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS jokes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            content TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
-
-init_db()
+# In-memory storage (safe for Render)
+jokes = []
 
 @app.route("/")
 def home():
@@ -25,34 +13,23 @@ def home():
 
 @app.route("/get_joke")
 def get_joke():
-    url = "https://official-joke-api.appspot.com/random_joke"
-    res = requests.get(url, timeout=5).json()
-    joke = res["setup"] + " 😂 " + res["punchline"]
-    return jsonify({"joke": joke})
+    try:
+        url = "https://official-joke-api.appspot.com/random_joke"
+        res = requests.get(url, timeout=5).json()
+        joke = res["setup"] + " 😂 " + res["punchline"]
+        return jsonify({"joke": joke})
+    except:
+        return jsonify({"joke": "Why did the server fail? 😂 Because it had too many bugs!"})
 
 @app.route("/save_joke", methods=["POST"])
 def save_joke():
-    joke = request.json["joke"]
-
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO jokes (content) VALUES (?)", (joke,))
-    conn.commit()
-    conn.close()
-
+    data = request.get_json()
+    jokes.append(data["joke"])
     return jsonify({"message": "Saved!"})
 
 @app.route("/saved")
 def saved():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM jokes")
-    jokes = cursor.fetchall()
-    conn.close()
-
     return render_template("saved.html", jokes=jokes)
-
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
