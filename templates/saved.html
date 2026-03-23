@@ -2,19 +2,20 @@
 <html>
 <head>
   <title>Saved Jokes</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-  <div class="container">
-    <h1>❤️ Saved Jokes</h1>
+  <h1>❤️ Saved Jokes</h1>
 
+  {% if jokes %}
     {% for joke in jokes %}
-      <p>{{ joke[1] }}</p>
+      <p>{{ joke }}</p>
       <hr>
     {% endfor %}
+  {% else %}
+    <p>No jokes saved yet 😢</p>
+  {% endif %}
 
-    <a href="/">⬅ Back</a>
-  </div>
+  <a href="/">⬅ Back</a>
 </body>
 </html>

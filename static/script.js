@@ -1,6 +1,6 @@
 let currentJoke = "";
 
-// Get joke from Flask backend
+// Get joke
 async function getJoke() {
   try {
     const res = await fetch("/get_joke");
@@ -15,34 +15,33 @@ async function getJoke() {
   }
 }
 
-// Speak joke (SAFE VERSION - no emoji regex)
+// Speak joke
 function speakJoke() {
   if (!currentJoke) {
     alert("Get a joke first!");
     return;
   }
 
-  // Optional light cleanup (safe for all browsers)
   let cleanText = currentJoke.replace(/😂|🤣|😅|😆/g, "");
 
   let speech = new SpeechSynthesisUtterance(cleanText);
   speech.lang = "en-US";
-  speech.rate = 1;
-  speech.pitch = 1;
 
-  speechSynthesis.cancel(); // stop previous speech
+  speechSynthesis.cancel();
   speechSynthesis.speak(speech);
 }
 
-// Save joke to backend
+// Save joke
 async function saveJoke() {
-  if (!currentJoke) {
-    alert("Get a joke first!");
+  if (!currentJoke || currentJoke.length < 5) {
+    alert("Get a valid joke first!");
     return;
   }
 
+  console.log("Saving:", currentJoke); // debug
+
   try {
-    await fetch("/save_joke", {
+    const res = await fetch("/save_joke", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -50,7 +49,9 @@ async function saveJoke() {
       body: JSON.stringify({ joke: currentJoke })
     });
 
-    alert("Saved successfully! 💾");
+    const data = await res.json();
+
+    alert(data.message || "Saved!");
   } catch (error) {
     alert("Failed to save joke 😅");
     console.error(error);

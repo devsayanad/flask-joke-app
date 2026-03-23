@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# In-memory storage (safe for Render)
+# In-memory storage (resets on restart - normal)
 jokes = []
 
 @app.route("/")
@@ -15,16 +15,30 @@ def home():
 def get_joke():
     try:
         url = "https://official-joke-api.appspot.com/random_joke"
-        res = requests.get(url, timeout=5).json()
-        joke = res["setup"] + " 😂 " + res["punchline"]
+        res = requests.get(url, timeout=3)
+        data = res.json()
+
+        joke = data["setup"] + " 😂 " + data["punchline"]
         return jsonify({"joke": joke})
+
     except:
-        return jsonify({"joke": "Why did the server fail? 😂 Because it had too many bugs!"})
+        return jsonify({"joke": "Joke API failed 😅 Try again!"})
 
 @app.route("/save_joke", methods=["POST"])
 def save_joke():
     data = request.get_json()
-    jokes.append(data["joke"])
+
+    # SAFE extraction
+    joke = str(data.get("joke", "")).strip()
+
+    # Ignore invalid / short data
+    if len(joke) < 5:
+        return jsonify({"message": "Invalid joke"}), 400
+
+    jokes.append(joke)
+
+    print("Saved:", joke)  # debug log
+
     return jsonify({"message": "Saved!"})
 
 @app.route("/saved")
